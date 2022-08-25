@@ -13,8 +13,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'SMS_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://localhost'],
-          queue: 'sms_queue',
+          urls: [process.env.QUEUE_URI],
+          queue: process.env.QUEUE_NAME,
           queueOptions: {
             durable: false
           },
