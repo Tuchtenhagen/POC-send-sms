@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class SMSService {
+
+  constructor(@Inject('SMS_SERVICE') private client: ClientProxy){}
 
   getMessageFromApi(): String {
     return "getting Message from Api"
@@ -11,10 +14,10 @@ export class SMSService {
     
     const processedNumber = this.processNumber(SendSMSDto.phoneNumber)
     const DDD = this.getDDD(processedNumber)
-
     
+    this.sendEvent(DDD)
 
-    return DDD
+      return 'sent to queue'
   }
 
   private processNumber(number): String {
@@ -24,5 +27,10 @@ export class SMSService {
   private getDDD(number): String {
     const regex = /^[\d]{2}/
     return number.match(regex)
+  }
+
+  private sendEvent(event): void {
+    this.client.connect()
+    this.client.emit(process.env.QUEUE_NAME, event)
   }
 }
